@@ -1,0 +1,869 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "CAR",
+      "gridPos": { "h": 2, "w": 4, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "/^car_name$/" },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#dee0e2" },
+          "mappings": [],
+          "noValue": "—"
+        }
+      },
+      "targets": [
+        { "expr": "gt7_session_info", "instant": true, "legendFormat": "{{car_name}}", "format": "table", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "TRACK",
+      "gridPos": { "h": 2, "w": 4, "x": 4, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "/^track_name$/" },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#dee0e2" },
+          "noValue": "—"
+        }
+      },
+      "targets": [
+        { "expr": "gt7_session_info", "instant": true, "legendFormat": "{{track_name}}", "format": "table", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "LAP",
+      "gridPos": { "h": 2, "w": 2, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#dee0e2" },
+          "noValue": "—"
+        }
+      },
+      "targets": [
+        { "expr": "gt7_lap_count", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "POS",
+      "gridPos": { "h": 2, "w": 2, "x": 10, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#dee0e2" },
+          "noValue": "—"
+        }
+      },
+      "targets": [
+        { "expr": "gt7_race_position", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "FUEL %",
+      "gridPos": { "h": 2, "w": 4, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 15 },
+              { "color": "#73bf69", "value": 30 }
+            ]
+          },
+          "decimals": 0
+        }
+      },
+      "targets": [
+        { "expr": "gt7_fuel_pct", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "RIG CFG",
+      "gridPos": { "h": 2, "w": 2, "x": 16, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#5794f2" },
+          "decimals": 0
+        }
+      },
+      "targets": [
+        { "expr": "gt7_rig_version", "refId": "A", "legendFormat": "v" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "DATA AGE (s)",
+      "gridPos": { "h": 2, "w": 3, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#73bf69", "value": null },
+              { "color": "orange", "value": 2 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "expr": "gt7_data_age_seconds", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "UP",
+      "gridPos": { "h": 2, "w": 3, "x": 21, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "background",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "1": { "text": "LIVE",  "color": "green" }, "0": { "text": "OFFLINE", "color": "red" } } }
+          ],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] }
+        }
+      },
+      "targets": [
+        { "expr": "gt7_up", "refId": "A" }
+      ]
+    },
+
+    {
+      "type": "stat",
+      "title": "BEST LAP",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 2 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "clockms",
+          "color": { "mode": "fixed", "fixedColor": "#a847b3" },
+          "decimals": 3,
+          "noValue": "—:—.———"
+        }
+      },
+      "targets": [
+        { "expr": "gt7_best_lap_ms", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "LAST LAP",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "clockms",
+          "color": { "mode": "fixed", "fixedColor": "#dee0e2" },
+          "decimals": 3,
+          "noValue": "—:—.———"
+        }
+      },
+      "targets": [
+        { "expr": "gt7_last_lap_ms", "refId": "A" }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "GEAR",
+      "gridPos": { "h": 4, "w": 4, "x": 6, "y": 2 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": -1,
+          "max": 8,
+          "mappings": [
+            { "type": "value", "options": { "-1": { "text": "R", "color": "red" } } },
+            { "type": "value", "options": { "0":  { "text": "N", "color": "#dee0e2" } } }
+          ],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "#5794f2", "value": null } ] }
+        }
+      },
+      "targets": [
+        { "expr": "gt7_gear", "refId": "A" }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "SPEED (km/h)",
+      "gridPos": { "h": 4, "w": 4, "x": 10, "y": 2 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "showThresholdMarkers": true,
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "velocitykmh",
+          "min": 0,
+          "max": 350,
+          "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#5794f2", "value": null },
+              { "color": "#73bf69", "value": 100 },
+              { "color": "orange", "value": 220 },
+              { "color": "red", "value": 280 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "expr": "gt7_speed_kph", "refId": "A" }
+      ]
+    },
+    {
+      "type": "bargauge",
+      "title": "RPM",
+      "gridPos": { "h": 4, "w": 4, "x": 14, "y": 2 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "displayMode": "lcd",
+        "orientation": "horizontal",
+        "showUnfilled": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 9000,
+          "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#73bf69", "value": null },
+              { "color": "orange", "value": 6500 },
+              { "color": "red", "value": 7500 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { "expr": "gt7_rpm", "refId": "A" }
+      ]
+    },
+    {
+      "type": "bargauge",
+      "title": "THROTTLE",
+      "gridPos": { "h": 2, "w": 6, "x": 18, "y": 2 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 0,
+          "color": { "mode": "fixed", "fixedColor": "#73bf69" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [ { "color": "#73bf69", "value": null } ]
+          }
+        }
+      },
+      "targets": [
+        { "expr": "gt7_throttle_pct", "refId": "A" }
+      ]
+    },
+    {
+      "type": "bargauge",
+      "title": "BRAKE",
+      "gridPos": { "h": 2, "w": 6, "x": 18, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 0,
+          "color": { "mode": "fixed", "fixedColor": "#f2495c" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [ { "color": "#f2495c", "value": null } ]
+          }
+        }
+      },
+      "targets": [
+        { "expr": "gt7_brake_pct", "refId": "A" }
+      ]
+    },
+
+    {
+      "type": "timeseries",
+      "title": "SPEED TRACE",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": false }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "velocitykmh",
+          "decimals": 0,
+          "min": 0,
+          "color": { "mode": "fixed", "fixedColor": "#5794f2" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "spanNulls": true,
+            "axisPlacement": "left",
+            "gradientMode": "opacity"
+          }
+        }
+      },
+      "targets": [
+        { "expr": "gt7_speed_kph", "refId": "A", "legendFormat": "speed" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "THROTTLE / BRAKE",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 25,
+            "showPoints": "never",
+            "spanNulls": true,
+            "gradientMode": "opacity"
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "throttle" },
+            "properties": [ { "id": "color", "value": { "mode": "fixed", "fixedColor": "#73bf69" } } ] },
+          { "matcher": { "id": "byName", "options": "brake" },
+            "properties": [ { "id": "color", "value": { "mode": "fixed", "fixedColor": "#f2495c" } } ] }
+        ]
+      },
+      "targets": [
+        { "expr": "gt7_throttle_pct", "refId": "A", "legendFormat": "throttle" },
+        { "expr": "gt7_brake_pct", "refId": "B", "legendFormat": "brake" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "RPM & GEAR",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "rpm" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "#ff9830" } },
+              { "id": "unit", "value": "rotrpm" },
+              { "id": "custom.axisPlacement", "value": "left" }
+            ] },
+          { "matcher": { "id": "byName", "options": "gear" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "#5794f2" } },
+              { "id": "custom.drawStyle", "value": "line" },
+              { "id": "custom.lineInterpolation", "value": "stepAfter" },
+              { "id": "custom.axisPlacement", "value": "right" },
+              { "id": "min", "value": -1 },
+              { "id": "max", "value": 8 }
+            ] }
+        ]
+      },
+      "targets": [
+        { "expr": "gt7_rpm", "refId": "A", "legendFormat": "rpm" },
+        { "expr": "gt7_gear", "refId": "B", "legendFormat": "gear" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "TIRE TEMPS (°C)",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "decimals": 1,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "FL" }, "properties": [ { "id": "color", "value": { "mode": "fixed", "fixedColor": "#5794f2" } } ] },
+          { "matcher": { "id": "byName", "options": "FR" }, "properties": [ { "id": "color", "value": { "mode": "fixed", "fixedColor": "#73bf69" } } ] },
+          { "matcher": { "id": "byName", "options": "RL" }, "properties": [ { "id": "color", "value": { "mode": "fixed", "fixedColor": "#ff9830" } } ] },
+          { "matcher": { "id": "byName", "options": "RR" }, "properties": [ { "id": "color", "value": { "mode": "fixed", "fixedColor": "#f2495c" } } ] }
+        ]
+      },
+      "targets": [
+        { "expr": "gt7_tire_temp_c{wheel=\"fl\"}", "refId": "A", "legendFormat": "FL" },
+        { "expr": "gt7_tire_temp_c{wheel=\"fr\"}", "refId": "B", "legendFormat": "FR" },
+        { "expr": "gt7_tire_temp_c{wheel=\"rl\"}", "refId": "C", "legendFormat": "RL" },
+        { "expr": "gt7_tire_temp_c{wheel=\"rr\"}", "refId": "D", "legendFormat": "RR" }
+      ]
+    },
+
+    {
+      "type": "stat",
+      "title": "FL",
+      "gridPos": { "h": 3, "w": 3, "x": 0, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "background",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#5794f2", "value": null },
+              { "color": "#73bf69", "value": 75 },
+              { "color": "orange", "value": 95 },
+              { "color": "red", "value": 110 }
+            ]
+          }
+        }
+      },
+      "targets": [ { "expr": "gt7_tire_temp_c{wheel=\"fl\"}", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "FR",
+      "gridPos": { "h": 3, "w": 3, "x": 3, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "background",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#5794f2", "value": null },
+              { "color": "#73bf69", "value": 75 },
+              { "color": "orange", "value": 95 },
+              { "color": "red", "value": 110 }
+            ]
+          }
+        }
+      },
+      "targets": [ { "expr": "gt7_tire_temp_c{wheel=\"fr\"}", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "RL",
+      "gridPos": { "h": 3, "w": 3, "x": 0, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "background",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#5794f2", "value": null },
+              { "color": "#73bf69", "value": 75 },
+              { "color": "orange", "value": 95 },
+              { "color": "red", "value": 110 }
+            ]
+          }
+        }
+      },
+      "targets": [ { "expr": "gt7_tire_temp_c{wheel=\"rl\"}", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "RR",
+      "gridPos": { "h": 3, "w": 3, "x": 3, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "background",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "decimals": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#5794f2", "value": null },
+              { "color": "#73bf69", "value": 75 },
+              { "color": "orange", "value": 95 },
+              { "color": "red", "value": 110 }
+            ]
+          }
+        }
+      },
+      "targets": [ { "expr": "gt7_tire_temp_c{wheel=\"rr\"}", "refId": "A" } ]
+    },
+
+    {
+      "type": "stat",
+      "title": "WATER (°C)",
+      "gridPos": { "h": 3, "w": 4, "x": 6, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#5794f2", "value": null },
+              { "color": "#73bf69", "value": 80 },
+              { "color": "orange", "value": 100 },
+              { "color": "red", "value": 110 }
+            ]
+          }
+        }
+      },
+      "targets": [ { "expr": "gt7_water_temp_c", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "OIL TEMP (°C)",
+      "gridPos": { "h": 3, "w": 4, "x": 10, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#5794f2", "value": null },
+              { "color": "#73bf69", "value": 90 },
+              { "color": "orange", "value": 120 },
+              { "color": "red", "value": 135 }
+            ]
+          }
+        }
+      },
+      "targets": [ { "expr": "gt7_oil_temp_c", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "OIL PRESSURE (bar)",
+      "gridPos": { "h": 3, "w": 4, "x": 14, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pressurebar",
+          "decimals": 2,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 1.5 },
+              { "color": "#73bf69", "value": 3 }
+            ]
+          }
+        }
+      },
+      "targets": [ { "expr": "gt7_oil_pressure_bar", "refId": "A" } ]
+    },
+    {
+      "type": "stat",
+      "title": "BOOST (bar)",
+      "gridPos": { "h": 3, "w": 4, "x": 18, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"] },
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "value",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pressurebar",
+          "decimals": 2,
+          "color": { "mode": "fixed", "fixedColor": "#5794f2" }
+        }
+      },
+      "targets": [ { "expr": "gt7_boost_bar", "refId": "A" } ]
+    },
+
+    {
+      "type": "xychart",
+      "title": "TRACK MAP (live position)",
+      "gridPos": { "h": 8, "w": 10, "x": 6, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "mapping": "auto",
+        "series": [
+          {
+            "showPoints": "always",
+            "pointSize": { "fixed": 3 },
+            "lineWidth": 2
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#73bf69" },
+          "custom": { "hideFrom": { "tooltip": false, "viz": false, "legend": true } }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Time" },
+            "properties": [ { "id": "custom.hideFrom", "value": { "viz": true, "tooltip": true, "legend": true } } ] }
+        ]
+      },
+      "transformations": [
+        { "id": "joinByField", "options": { "byField": "Time", "mode": "outer" } },
+        { "id": "filterFieldsByName", "options": { "include": { "names": ["x", "z"] } } }
+      ],
+      "targets": [
+        { "expr": "gt7_position_m{axis=\"x\"}", "refId": "A", "legendFormat": "x" },
+        { "expr": "gt7_position_m{axis=\"z\"}", "refId": "B", "legendFormat": "z" }
+      ]
+    },
+
+    {
+      "type": "table",
+      "title": "FLAGS / STATE",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "options": {
+        "showHeader": true,
+        "footer": { "show": false },
+        "cellHeight": "sm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "cellOptions": { "type": "color-background", "mode": "basic" }, "align": "center" },
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "—", "color": "#3a3a3a" }, "1": { "text": "ON", "color": "#73bf69" } } }
+          ],
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#1f1f1f", "value": null },
+              { "color": "#73bf69", "value": 1 }
+            ]
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "name" },
+            "properties": [
+              { "id": "custom.cellOptions", "value": { "type": "auto" } },
+              { "id": "custom.align", "value": "left" },
+              { "id": "custom.width", "value": 130 }
+            ] }
+        ]
+      },
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "instance": true, "job": true }, "indexByName": { "name": 0, "Value": 1 } } }
+      ],
+      "targets": [
+        { "expr": "gt7_flag", "refId": "A", "instant": true, "format": "table" }
+      ]
+    }
+  ],
+  "refresh": "1s",
+  "schemaVersion": 39,
+  "tags": ["gt7", "racing", "pit-wall"],
+  "templating": { "list": [] },
+  "time": { "from": "now-2m", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["1s", "2s", "5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h"]
+  },
+  "timezone": "browser",
+  "title": "GT7 Pit Wall",
+  "uid": "gt7-pit-wall",
+  "version": 1,
+  "weekStart": ""
+}

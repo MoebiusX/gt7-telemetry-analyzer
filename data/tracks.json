@@ -1,0 +1,114 @@
+{
+  "_comment": "Track fingerprint library. Each entry has an approximate bounding box (xMin/xMax/zMin/zMax/yMin/yMax in meters) and a target lap distance. matchTrack() compares a captured fingerprint against these with the given tolerance. Unknown fingerprints get appended automatically by the capture process with id 'unknown-<timestamp>'; rename them after.",
+  "_seed_note": "Kyoto Yamagiwa bounds are seeded from brake-zone apex data in memory (project_current_combo.md, week prior to 2026-05-09). Actual track polygon likely extends a bit further — tolerance is set wide enough to absorb that.",
+  "tolerance": {
+    "boundsM": 150,
+    "lapDistancePct": 20
+  },
+  "tracks": [
+    {
+      "id": "kyoto-yamagiwa",
+      "name": "Kyoto Driving Park - Yamagiwa",
+      "bounds": {
+        "xMin": -900,
+        "xMax": 450,
+        "zMin": -250,
+        "zMax": 480,
+        "yMin": 80,
+        "yMax": 120
+      },
+      "lapDistanceM": 4800
+    },
+    {
+      "id": "willow-springs-big-willow",
+      "name": "Willow Springs International Raceway: Big Willow",
+      "bounds": {
+        "xMin": -647,
+        "xMax": 720,
+        "yMin": -37,
+        "yMax": 11,
+        "zMin": -139,
+        "zMax": 662
+      },
+      "lapDistanceM": 4023,
+      "_addedAt": "2026-05-11T19:33:25.851Z",
+      "_renamedAt": "2026-05-11T22:30:00.000Z",
+      "_note": "Auto-registered with wrong lapDistanceM=2448 (fingerprinter bug — avg speed was dragged down by pit/idle samples; fixed in metadata.js by filtering <30 km/h). True lap is 2.5 mi / 4023 m."
+    },
+    {
+      "id": "unknown-1778577606831",
+      "name": "Unknown track (rename me) - lap 2690m",
+      "bounds": {
+        "xMin": -648,
+        "xMax": 722,
+        "yMin": -37,
+        "yMax": 11,
+        "zMin": -136,
+        "zMax": 662
+      },
+      "lapDistanceM": 2690,
+      "_addedAt": "2026-05-12T09:20:06.831Z",
+      "_samples": 100764
+    },
+    {
+      "id": "unknown-1778785908847",
+      "name": "Unknown track (rename me) - lap 3216m",
+      "bounds": {
+        "xMin": -332,
+        "xMax": -332,
+        "yMin": -28,
+        "yMax": -28,
+        "zMin": 313,
+        "zMax": 313
+      },
+      "lapDistanceM": 3216,
+      "_addedAt": "2026-05-14T19:11:48.847Z",
+      "_samples": 1801
+    },
+    {
+      "id": "unknown-1778841801465",
+      "name": "Unknown track (rename me) - lap 4433m",
+      "bounds": {
+        "xMin": 0,
+        "xMax": 529,
+        "yMin": -38,
+        "yMax": 0,
+        "zMin": 0,
+        "zMax": 658
+      },
+      "lapDistanceM": 4433,
+      "_addedAt": "2026-05-15T10:43:21.465Z",
+      "_samples": 23332
+    },
+    {
+      "id": "unknown-1778847277539",
+      "name": "Unknown track (rename me) - lap 3325m",
+      "bounds": {
+        "xMin": -647,
+        "xMax": 721,
+        "yMin": -37,
+        "yMax": 11,
+        "zMin": -404,
+        "zMax": 665
+      },
+      "lapDistanceM": 3325,
+      "_addedAt": "2026-05-15T12:14:37.539Z",
+      "_samples": 98075
+    },
+    {
+      "id": "unknown-1778866626837",
+      "name": "Unknown track (rename me) - lap 952m",
+      "bounds": {
+        "xMin": 297,
+        "xMax": 297,
+        "yMin": -36,
+        "yMax": -36,
+        "zMin": 475,
+        "zMax": 475
+      },
+      "lapDistanceM": 952,
+      "_addedAt": "2026-05-15T17:37:06.837Z",
+      "_samples": 1801
+    }
+  ]
+}

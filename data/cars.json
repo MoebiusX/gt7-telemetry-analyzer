@@ -1,0 +1,12 @@
+{
+  "_comment": "GT7 carCode -> car metadata. carCode is the int32 at packet offset 0x124. Add entries as you encounter new cars; unknown codes are logged on capture so you know what to fill in. Class follows GT7 convention (Gr.1/2/3/4/B/X, N-class etc).",
+  "_source": "Seeded from memory + captures. The wider community list lives at https://github.com/Nenkai/PDTools (carCode dump) — copy entries as needed.",
+  "2161": { "name": "Nissan GT-R Gr.4", "class": "Gr.4" },
+  "2166": { "name": "Alfa Romeo 4C Gr.4", "class": "Gr.4" },
+  "2177": { "name": "Lamborghini Huracán GT3 '15", "class": "Gr.3" },
+  "3218": { "name": "Ferrari 488 GT3", "class": "Gr.3" },
+  "3221": { "name": "BMW M6 GT3 Sprint Model '16", "class": "Gr.3" },
+  "3253": { "name": "Lamborghini Huracán Gr.4", "class": "Gr.4" },
+  "3501": { "name": "Genesis G70 Gr.4", "class": "Gr.4" },
+  "3537": { "name": "MAZDA3 Gr.4", "class": "Gr.4" }
+}

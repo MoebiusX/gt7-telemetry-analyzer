@@ -1,0 +1,29 @@
+# Recorded telemetry & generated artifacts (per-user data, often gigabytes)
+recordings/
+report.html
+*.log
+
+# Native binaries (download separately — too large for git)
+monitoring/native/
+
+# Local runtime data — generated per user, contains driver names, ghost laps, etc.
+data/active-driver.json
+data/drivers.json
+data/ghost.json
+data/cutoff.json
+rig-config.json
+
+# Claude Code local settings (per-machine)
+.claude/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.idea/
+.vscode/

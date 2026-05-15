@@ -1,0 +1,30 @@
+{
+  "config": {
+    "pedals": {
+      "shortElastomer": "soft-tip",
+      "longElastomers": ["red", "yellow"]
+    },
+    "ffb": {
+      "ghubStrengthNm": 8,
+      "ghubFilter": 11,
+      "ghubDamper": 0,
+      "gt7MaxTorque": 5,
+      "gt7Sensitivity": 2,
+      "steeringDeg": 1080,
+      "notes": "your wheel + game force feedback settings"
+    },
+    "visual": {
+      "screenSizeInch": 32,
+      "eyeDistanceCm": 70,
+      "eyeLevel": "mid"
+    },
+    "rig": {
+      "pedalPlatePosition": "your rig position label",
+      "seatExtension": "medium",
+      "backRecline": "notch 3"
+    },
+    "notes": "free-form description of your current setup"
+  },
+  "version": 1,
+  "updatedAt": 0
+}

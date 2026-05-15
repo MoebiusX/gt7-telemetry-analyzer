@@ -1,0 +1,17 @@
+{
+  "name": "gt7-telemetry-analyzer",
+  "version": "0.1.0",
+  "description": "Capture and decode Gran Turismo 7 telemetry from a PlayStation 5 over UDP.",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "capture": "node index.js",
+    "analyze": "node analyze.js",
+    "test": "node test-salsa20.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}
