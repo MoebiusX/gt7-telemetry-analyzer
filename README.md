@@ -166,9 +166,9 @@ a final scrub before pushing.
 
 ## Created by
 
-This project was built together by a sim racer and an AI, over a stretch of
-late nights and tight sessions, while chasing the kind of lap time that
-sounds impossible until the data tells you otherwise.
+This project was built together by a sim racer and an AI, over the stretch
+of a long Friday night, while chasing the kind of lap time that sounds
+impossible until the data tells you otherwise.
 
 - **A human driver** who kept pushing, kept asking better questions, and
   refused to settle for "the brake just feels weird."
