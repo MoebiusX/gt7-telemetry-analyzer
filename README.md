@@ -96,15 +96,16 @@ This is community-known; this codebase implements:
 
 ### Run
 
-The `192.168.1.42` below is an example — **replace it with the IP (or
-hostname) of YOUR PS5**, found in the console's Network settings.
+Replace `<YOUR_PS5_IP>` with the IPv4 address your console shows under
+`Settings → Network → View Connection Status` (or a hostname you've mapped
+to it in your `hosts` file / local DNS).
 
 ```powershell
 # Pass via flag:
-node index.js --ps5 192.168.1.42      # ← replace with YOUR PS5's IP
+node index.js --ps5 <YOUR_PS5_IP>
 
 # Or via env var:
-$env:GT7_PS5_HOST = "192.168.1.42"    # ← same
+$env:GT7_PS5_HOST = "<YOUR_PS5_IP>"
 node index.js
 
 # Or with a friendly hostname (if you've mapped it in hosts/DNS):
