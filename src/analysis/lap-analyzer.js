@@ -8,7 +8,7 @@ const readline = require('node:readline');
 const driverStore = require('./driver-store');
 const ghostStore  = require('./ghost-store');
 
-const RECORD_DIR = path.resolve(__dirname, 'recordings');
+const RECORD_DIR = path.resolve(__dirname, '..', '..', 'recordings');
 const TTL_MS = 30_000; // re-analyze at most every 30s
 
 // Cache keyed by (file, driver-id, ghost-completed-ms) so switching either

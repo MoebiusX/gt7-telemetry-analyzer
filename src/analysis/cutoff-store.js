@@ -10,7 +10,7 @@
 const fs   = require('node:fs');
 const path = require('node:path');
 
-const DATA_DIR    = path.resolve(__dirname, 'data');
+const DATA_DIR    = path.resolve(__dirname, '..', '..', 'data');
 const CUTOFF_FILE = path.join(DATA_DIR, 'cutoff.json');
 
 function load() {

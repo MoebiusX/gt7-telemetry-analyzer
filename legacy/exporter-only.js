@@ -19,7 +19,7 @@ function arg(flag, fallback) {
 }
 
 const PORT = Number(arg('--port', 9477));
-const metrics = require('./metrics');
+const metrics = require('../src/server/metrics');
 metrics.start(PORT);
 
 process.on('SIGINT',  () => { metrics.stop(); process.exit(0); });

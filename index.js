@@ -14,14 +14,14 @@
 const dgram = require('node:dgram');
 const fs    = require('node:fs');
 const path  = require('node:path');
-const { decrypt } = require('./salsa20');
-const { parse, formatLapTime } = require('./parser');
-const metrics  = require('./metrics');
-const config   = require('./config');
-const metadata = require('./metadata');
-const { LapPredictor } = require('./lap-predictor');
-const { EventLogger }  = require('./event-logger');
-const driverStore      = require('./driver-store');
+const { decrypt } = require('./src/capture/salsa20');
+const { parse, formatLapTime } = require('./src/capture/parser');
+const metrics  = require('./src/server/metrics');
+const config   = require('./src/config');
+const metadata = require('./src/capture/metadata');
+const { LapPredictor } = require('./src/analysis/lap-predictor');
+const { EventLogger }  = require('./src/analysis/event-logger');
+const driverStore      = require('./src/analysis/driver-store');
 
 const predictor = new LapPredictor();
 let events = null; // initialized after RECORD_DIR is established

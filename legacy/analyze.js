@@ -7,10 +7,10 @@
 const fs   = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
-const { formatLapTime } = require('./parser');
-const metadata = require('./metadata');
+const { formatLapTime } = require('../src/capture/parser');
+const metadata = require('../src/capture/metadata');
 
-const RECORD_DIR = path.resolve(__dirname, 'recordings');
+const RECORD_DIR = path.resolve(__dirname, '..', 'recordings');
 
 function pickFile() {
   const arg = process.argv[2];

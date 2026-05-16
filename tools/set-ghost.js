@@ -8,7 +8,7 @@
 //
 // If neither --lap nor --target is given, the fastest lap in the file is picked.
 
-const ghost = require('../ghost-store');
+const ghost = require('../src/analysis/ghost-store');
 
 function arg(name, fallback) {
   const i = process.argv.indexOf(name);

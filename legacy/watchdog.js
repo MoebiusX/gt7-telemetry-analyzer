@@ -15,8 +15,8 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const LOG_PATH = path.resolve(__dirname, 'watchdog.log');
-const CHILD_SCRIPT = path.resolve(__dirname, 'index.js');
+const LOG_PATH = path.resolve(__dirname, '..', 'watchdog.log');
+const CHILD_SCRIPT = path.resolve(__dirname, '..', 'index.js');
 const childArgs = process.argv.slice(2);
 
 const MIN_RESTART_INTERVAL_MS = 2000;   // backoff if child crashes immediately

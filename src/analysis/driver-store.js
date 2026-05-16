@@ -10,7 +10,7 @@
 const fs   = require('node:fs');
 const path = require('node:path');
 
-const DATA_DIR = path.resolve(__dirname, 'data');
+const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
 const DRIVERS_FILE = path.join(DATA_DIR, 'drivers.json');
 const ACTIVE_FILE  = path.join(DATA_DIR, 'active-driver.json');
 

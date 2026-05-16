@@ -49,7 +49,7 @@
 const fs   = require('node:fs');
 const path = require('node:path');
 
-const CONFIG_PATH = path.resolve(__dirname, 'rig-config.json');
+const CONFIG_PATH = path.resolve(__dirname, '..', 'rig-config.json');
 
 let state = { config: {}, version: 0, updatedAt: 0 };
 

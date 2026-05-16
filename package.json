@@ -5,10 +5,12 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "capture": "node index.js",
-    "analyze": "node analyze.js",
-    "test": "node test-salsa20.js"
+    "start":    "node index.js",
+    "capture":  "node index.js",
+    "test":     "node test/test-salsa20.js",
+    "analyze":  "node legacy/analyze.js",
+    "report":   "node legacy/report.js",
+    "watchdog": "node legacy/watchdog.js"
   },
   "engines": {
     "node": ">=18"

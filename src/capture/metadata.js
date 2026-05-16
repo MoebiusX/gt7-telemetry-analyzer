@@ -13,7 +13,7 @@
 const fs   = require('node:fs');
 const path = require('node:path');
 
-const DATA_DIR    = path.resolve(__dirname, 'data');
+const DATA_DIR    = path.resolve(__dirname, '..', '..', 'data');
 const CARS_PATH   = path.join(DATA_DIR, 'cars.json');
 const TRACKS_PATH = path.join(DATA_DIR, 'tracks.json');
 

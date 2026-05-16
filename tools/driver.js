@@ -7,7 +7,7 @@
 //   node tools/driver.js remove <id>
 //   node tools/driver.js use <id>            # set active driver
 
-const ds = require('../driver-store');
+const ds = require('../src/analysis/driver-store');
 
 function arg(name, fallback) {
   const i = process.argv.indexOf(name);

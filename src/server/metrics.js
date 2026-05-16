@@ -11,11 +11,11 @@
 const http   = require('node:http');
 const fs     = require('node:fs');
 const path   = require('node:path');
-const config = require('./config');
-const lapAnalyzer   = require('./lap-analyzer');
-const ghostStore    = require('./ghost-store');
-const driverStore   = require('./driver-store');
-const cutoffStore   = require('./cutoff-store');
+const config = require('../config');
+const lapAnalyzer   = require('../analysis/lap-analyzer');
+const ghostStore    = require('../analysis/ghost-store');
+const driverStore   = require('../analysis/driver-store');
+const cutoffStore   = require('../analysis/cutoff-store');
 
 const state = {
   packet:           null,
@@ -1445,7 +1445,7 @@ ${navLinks('micro')}
 }
 
 function renderEventsHtml() {
-  const file = path.join(__dirname, 'recordings', `events-${new Date().toISOString().slice(0,10)}.jsonl`);
+  const file = path.join(__dirname, '..', '..', 'recordings', `events-${new Date().toISOString().slice(0,10)}.jsonl`);
   let lines = [];
   let err = null;
   try {

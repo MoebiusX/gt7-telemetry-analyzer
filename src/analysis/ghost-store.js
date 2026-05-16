@@ -12,9 +12,9 @@ const fs   = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
 
-const DATA_DIR = path.resolve(__dirname, 'data');
+const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
 const GHOST_FILE = path.join(DATA_DIR, 'ghost.json');
-const RECORD_DIR = path.resolve(__dirname, 'recordings');
+const RECORD_DIR = path.resolve(__dirname, '..', '..', 'recordings');
 
 let cache = null;
 let cacheMTime = 0;

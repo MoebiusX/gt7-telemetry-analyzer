@@ -135,6 +135,35 @@ Prometheus + Grafana. Double-click in Explorer or call the underlying
 
 ---
 
+## Project layout
+
+```
+gt7-telemetry-analyzer/
+├── index.js                  # entry point: UDP heartbeat + capture loop
+├── src/
+│   ├── config.js             # rig-config persistence
+│   ├── capture/              # the wire
+│   │   ├── salsa20.js        # Salsa20 stream cipher
+│   │   ├── parser.js         # 296-byte UDP packet → object
+│   │   └── metadata.js       # car / track fingerprint lookup
+│   ├── analysis/             # lap intelligence
+│   │   ├── lap-predictor.js  # live lap-time projection (XZ nearest-neighbor)
+│   │   ├── lap-analyzer.js   # session-level aggregation
+│   │   ├── ghost-store.js    # reference-lap storage
+│   │   ├── driver-store.js   # driver profiles
+│   │   ├── cutoff-store.js   # leaderboard cutoff tracker
+│   │   └── event-logger.js   # session_start / lap_end / pb_set event log
+│   └── server/
+│       └── metrics.js        # HTTP server + Prometheus exposition + dashboards
+├── tools/                    # standalone CLI analyzers
+├── services/                 # OS service controllers (Windows .ps1/.cmd)
+├── data/                     # game metadata + per-user runtime state (mostly gitignored)
+├── docs/                     # research / planning docs
+├── monitoring/               # Grafana dashboard JSON + Prometheus config
+├── test/                     # unit tests
+└── legacy/                   # older standalone scripts (kept for reference)
+```
+
 ## Tools (`tools/`)
 
 Standalone analyzers for one-off questions:

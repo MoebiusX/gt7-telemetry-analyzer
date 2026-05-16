@@ -2,7 +2,7 @@
 // Key = 0x80 then 31 zero bytes, IV = 8 zero bytes, plaintext = 64 zero bytes.
 // Expected first 64 bytes of keystream documented by D. J. Bernstein.
 
-const { decrypt } = require('./salsa20');
+const { decrypt } = require('../src/capture/salsa20');
 
 const key   = Buffer.alloc(32); key[0] = 0x80;
 const nonce = Buffer.alloc(8);

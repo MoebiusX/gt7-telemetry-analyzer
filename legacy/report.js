@@ -8,9 +8,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
-const { formatLapTime } = require('./parser');
+const { formatLapTime } = require('../src/capture/parser');
 
-const RECORD_DIR = path.resolve(__dirname, 'recordings');
+const RECORD_DIR = path.resolve(__dirname, '..', 'recordings');
 
 function pickFile() {
   const arg = process.argv[2];
@@ -769,7 +769,7 @@ async function main() {
   payloads.forEach((p, i) => printSessionSummary(i, p));
 
   const fileLabel = path.basename(file);
-  const outPath = path.resolve(__dirname, 'report.html');
+  const outPath = path.resolve(__dirname, '..', 'report.html');
   fs.writeFileSync(outPath, htmlMulti(payloads, fileLabel));
   const sizeMB = (fs.statSync(outPath).size / 1e6).toFixed(2);
   console.log(`\nHTML report: ${outPath}  (${sizeMB} MB) — ${payloads.length} session(s) rendered.`);
