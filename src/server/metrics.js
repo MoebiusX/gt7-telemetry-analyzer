@@ -16,6 +16,7 @@ const lapAnalyzer   = require('../analysis/lap-analyzer');
 const ghostStore    = require('../analysis/ghost-store');
 const driverStore   = require('../analysis/driver-store');
 const cutoffStore   = require('../analysis/cutoff-store');
+const sseBroker     = require('../publishers/sse-broker');
 
 const state = {
   packet:           null,
@@ -329,6 +330,7 @@ const NAV_HTML = `
 function navLinks(active) {
   const items = [
     ['/',          'overview'],
+    ['/hud60',     '60Hz HUD'],
     ['/laps',      'laps'],
     ['/micro',     'micro'],
     ['/track',     'track'],
@@ -1480,6 +1482,355 @@ ${navLinks('events')}
 </body></html>`;
 }
 
+function renderHud60Html() {
+  // Self-contained 60Hz streaming HUD. Subscribes to /hud60/stream (SSE),
+  // renders inside requestAnimationFrame at the browser's natural refresh rate
+  // (60Hz on most displays, 120/144/240 on high-refresh). No external deps.
+  return `<!doctype html><html><head><meta charset="utf-8">
+<title>GT7 60Hz HUD</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#000;color:#e0e6f0;font-family:-apple-system,system-ui,'Segoe UI',Roboto,sans-serif;overflow:hidden;font-variant-numeric:tabular-nums}
+  body{display:grid;grid-template-rows:36px 1fr 200px;grid-template-columns:1fr;gap:6px;padding:6px}
+  .topbar{display:flex;align-items:center;gap:14px;font-size:11px;color:#7a8499;padding:0 8px}
+  .topbar .pill{padding:2px 8px;border:1px solid #1f2a44;border-radius:3px;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+  .topbar .pill.live{color:#00e676;border-color:#00e676}
+  .topbar .pill.dead{color:#ff5252;border-color:#ff5252}
+  .topbar .right{margin-left:auto;display:flex;gap:14px}
+  .main{display:grid;grid-template-columns:120px 1fr 1fr 1fr 120px 220px;gap:6px;min-height:0}
+  .panel{background:#0a0e1a;border:1px solid #131a2a;border-radius:6px;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .label{position:absolute;top:6px;left:8px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#5a6680}
+  .gear{font-size:min(40vh,260px);font-weight:200;line-height:.85;color:#fff;font-family:'Helvetica Neue',Arial,sans-serif}
+  .gear.shift{color:#ffeb3b;animation:pulse .25s ease-in-out infinite alternate}
+  .gear.rev{color:#ff5252}
+  @keyframes pulse{from{opacity:.4}to{opacity:1}}
+  .speed{font-size:min(34vh,200px);font-weight:200;line-height:.9;color:#fff;font-family:'Helvetica Neue',Arial,sans-serif}
+  .speed-unit{font-size:14px;color:#5a6680;letter-spacing:.2em;margin-top:6px}
+  .laptime{font-size:38px;font-weight:300;color:#fff;font-variant-numeric:tabular-nums}
+  .laptime.pb{color:#b388ff}
+  .laptime small{display:block;font-size:11px;color:#7a8499;text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+  .pedal{flex:1;width:60%;background:#0a0e1a;border:1px solid #1f2a44;border-radius:4px;display:flex;flex-direction:column-reverse;overflow:hidden;margin-top:18px}
+  .pedal-fill{width:100%;transition:none}
+  .thr .pedal-fill{background:linear-gradient(to top,#0a4d2a,#00e676)}
+  .brk .pedal-fill{background:linear-gradient(to top,#5d0e0e,#ff5252)}
+  .pct{font-size:18px;color:#fff;margin-top:6px;font-weight:500}
+  .tires{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;width:100%;height:100%;padding:18px 6px 6px}
+  .tire{background:#0a0e1a;border:1px solid #1f2a44;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px}
+  .tire small{font-size:9px;color:#5a6680;text-transform:uppercase;margin-bottom:4px;letter-spacing:.1em}
+  .tire .v{font-size:22px;font-weight:300;color:#fff}
+  .traces{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;min-height:0}
+  .traces .panel{padding:4px 8px}
+  .traces canvas{width:100%;height:100%;display:block}
+  body.alarm{box-shadow:inset 0 0 0 4px #ff5252;animation:redpulse .3s ease-in-out infinite alternate}
+  @keyframes redpulse{from{box-shadow:inset 0 0 0 4px #5d0e0e}to{box-shadow:inset 0 0 0 4px #ff5252}}
+  .flag-strip{position:absolute;top:6px;right:8px;display:flex;gap:4px}
+  .flag-strip span{padding:2px 6px;border-radius:2px;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+  .flag-strip .on{background:#ff9800;color:#000}
+  .flag-strip .off{background:#1a2238;color:#3d5a96}
+</style>
+</head><body>
+
+<div class="topbar">
+  <span class="pill" id="conn">CONNECTING…</span>
+  <span id="track">—</span>
+  <span id="car">—</span>
+  <span class="right">
+    <span id="rate">0 Hz</span>
+    <span id="age">— ms</span>
+    <a href="/" style="color:#7a8499;text-decoration:none">overview</a>
+  </span>
+</div>
+
+<div class="main">
+  <!-- LAP TIMES -->
+  <div class="panel">
+    <div class="label">Last / Best</div>
+    <div class="laptime" id="lastTime">--:--.---</div>
+    <div class="laptime pb" id="bestTime" style="margin-top:14px">--:--.---</div>
+    <div style="font-size:11px;color:#7a8499;margin-top:8px">Lap <span id="lapNum">—</span> · Pos <span id="racePos">—</span></div>
+  </div>
+  <!-- THROTTLE -->
+  <div class="panel thr">
+    <div class="label">Throttle</div>
+    <div class="pedal"><div class="pedal-fill" id="thrFill" style="height:0%"></div></div>
+    <div class="pct" id="thrPct">0%</div>
+  </div>
+  <!-- GEAR + SPEED -->
+  <div class="panel">
+    <div class="label">Gear · Speed</div>
+    <div class="gear" id="gear">N</div>
+    <div class="speed" id="speed">0</div>
+    <div class="speed-unit">KPH</div>
+    <div class="flag-strip" id="flags"></div>
+  </div>
+  <!-- BRAKE -->
+  <div class="panel brk">
+    <div class="label">Brake</div>
+    <div class="pedal"><div class="pedal-fill" id="brkFill" style="height:0%"></div></div>
+    <div class="pct" id="brkPct">0%</div>
+  </div>
+  <!-- RPM -->
+  <div class="panel">
+    <div class="label">RPM</div>
+    <canvas id="rpmCanvas" width="120" height="280" style="width:100%;height:100%;flex:1"></canvas>
+    <div class="pct" id="rpmVal">0</div>
+  </div>
+  <!-- TIRES + ENGINE -->
+  <div class="panel" style="padding:0">
+    <div class="label" style="z-index:2">Tires (°C)</div>
+    <div class="tires">
+      <div class="tire"><small>FL</small><span class="v" id="tFL">—</span></div>
+      <div class="tire"><small>FR</small><span class="v" id="tFR">—</span></div>
+      <div class="tire"><small>RL</small><span class="v" id="tRL">—</span></div>
+      <div class="tire"><small>RR</small><span class="v" id="tRR">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM TIME-SERIES TRACES -->
+<div class="traces">
+  <div class="panel"><div class="label">Speed (kph) · 30s</div><canvas id="speedTrace"></canvas></div>
+  <div class="panel"><div class="label">RPM · 30s</div><canvas id="rpmTrace"></canvas></div>
+  <div class="panel"><div class="label">Throttle (g) / Brake (r) · 30s</div><canvas id="pedalTrace"></canvas></div>
+</div>
+
+<script>
+// ====== state ======
+const WIN_MS = 30_000;     // trace window
+const RING = 2400;         // upper bound on samples per series (~80Hz × 30s)
+const series = {
+  speed:    { t: new Float64Array(RING), v: new Float32Array(RING), n: 0, head: 0 },
+  rpm:      { t: new Float64Array(RING), v: new Float32Array(RING), n: 0, head: 0 },
+  throttle: { t: new Float64Array(RING), v: new Float32Array(RING), n: 0, head: 0 },
+  brake:    { t: new Float64Array(RING), v: new Float32Array(RING), n: 0, head: 0 },
+};
+let latest = null;
+let recvCount = 0, lastSecRecv = 0, lastSecAt = Date.now();
+let connected = false, lastMsgAt = 0;
+
+function pushSeries(s, t, v) {
+  s.t[s.head] = t; s.v[s.head] = v;
+  s.head = (s.head + 1) % RING;
+  if (s.n < RING) s.n++;
+}
+
+// ====== SSE connection ======
+function connectSSE() {
+  const es = new EventSource('/hud60/stream');
+  es.onopen = () => { connected = true; document.getElementById('conn').textContent = 'LIVE'; document.getElementById('conn').className = 'pill live'; };
+  es.onerror = () => { connected = false; document.getElementById('conn').textContent = 'RECONNECTING…'; document.getElementById('conn').className = 'pill dead'; };
+  es.onmessage = (ev) => {
+    let p; try { p = JSON.parse(ev.data); } catch { return; }
+    latest = p; recvCount++; lastSecRecv++; lastMsgAt = Date.now();
+    pushSeries(series.speed,    p.t, p.sp || 0);
+    pushSeries(series.rpm,      p.t, p.rpm || 0);
+    pushSeries(series.throttle, p.t, (p.thr || 0) / 2.55);
+    pushSeries(series.brake,    p.t, (p.brk || 0) / 2.55);
+  };
+}
+connectSSE();
+
+// ====== formatting ======
+function fmtLap(ms) {
+  if (!ms || ms <= 0) return '--:--.---';
+  const m = Math.floor(ms / 60000);
+  const s = ((ms - m * 60000) / 1000).toFixed(3);
+  return m + ':' + s.padStart(6, '0');
+}
+function gearLabel(g) {
+  if (g === 0) return 'R';
+  if (g === 15 || g == null) return 'N';
+  return String(g);
+}
+
+// ====== render ======
+const elGear = document.getElementById('gear');
+const elSpeed = document.getElementById('speed');
+const elThrFill = document.getElementById('thrFill');
+const elBrkFill = document.getElementById('brkFill');
+const elThrPct = document.getElementById('thrPct');
+const elBrkPct = document.getElementById('brkPct');
+const elTrack = document.getElementById('track');
+const elCar = document.getElementById('car');
+const elRate = document.getElementById('rate');
+const elAge  = document.getElementById('age');
+const elLast = document.getElementById('lastTime');
+const elBest = document.getElementById('bestTime');
+const elLap  = document.getElementById('lapNum');
+const elPos  = document.getElementById('racePos');
+const elTFL = document.getElementById('tFL'), elTFR = document.getElementById('tFR'), elTRL = document.getElementById('tRL'), elTRR = document.getElementById('tRR');
+const elRpmCanvas = document.getElementById('rpmCanvas');
+const elRpmVal = document.getElementById('rpmVal');
+const elFlags = document.getElementById('flags');
+const elSpeedTrace = document.getElementById('speedTrace');
+const elRpmTrace   = document.getElementById('rpmTrace');
+const elPedalTrace = document.getElementById('pedalTrace');
+
+function tireColor(t) {
+  if (t == null) return '#1a2238';
+  if (t < 70)  return '#1976d2';
+  if (t < 85)  return '#0a4d2a';
+  if (t < 100) return '#827717';
+  if (t < 115) return '#e65100';
+  return '#b71c1c';
+}
+
+function fitCanvas(c) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = c.clientWidth, h = c.clientHeight;
+  if (c.width !== w * dpr || c.height !== h * dpr) {
+    c.width = w * dpr; c.height = h * dpr;
+    c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+}
+
+function drawRpmBar() {
+  fitCanvas(elRpmCanvas);
+  const ctx = elRpmCanvas.getContext('2d');
+  const w = elRpmCanvas.clientWidth, h = elRpmCanvas.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+  if (!latest) return;
+  const max = latest.maxRpm || 9000;
+  const v = latest.rpm || 0;
+  const ratio = Math.max(0, Math.min(1, v / max));
+  // Segment bar
+  const SEGS = 24;
+  const segH = (h - 8) / SEGS;
+  for (let i = SEGS - 1; i >= 0; i--) {
+    const y = 4 + (SEGS - 1 - i) * segH;
+    const isOn = ratio >= (i + 1) / SEGS;
+    let color;
+    if (i / SEGS > 0.92) color = isOn ? '#ff5252' : '#3a0e0e';
+    else if (i / SEGS > 0.78) color = isOn ? '#ffeb3b' : '#3a3a0e';
+    else if (i / SEGS > 0.55) color = isOn ? '#00e676' : '#0e3a1a';
+    else color = isOn ? '#00d4ff' : '#0e2a3a';
+    ctx.fillStyle = color;
+    ctx.fillRect(8, y, w - 16, segH - 2);
+  }
+}
+
+function drawTrace(canvas, s, opts) {
+  fitCanvas(canvas);
+  const ctx = canvas.getContext('2d');
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+  if (s.n < 2) return;
+  const now = lastMsgAt || Date.now();
+  const tMin = now - WIN_MS;
+  // Find actual min/max value in window for autoscale
+  let vMin = opts.vMin != null ? opts.vMin : Infinity;
+  let vMax = opts.vMax != null ? opts.vMax : -Infinity;
+  if (opts.vMin == null || opts.vMax == null) {
+    for (let k = 0; k < s.n; k++) {
+      const i = (s.head - 1 - k + RING) % RING;
+      if (s.t[i] < tMin) break;
+      const v = s.v[i];
+      if (v < vMin) vMin = v;
+      if (v > vMax) vMax = v;
+    }
+    if (!isFinite(vMin)) vMin = 0;
+    if (!isFinite(vMax)) vMax = 1;
+    if (vMax - vMin < 1) vMax = vMin + 1;
+    vMin -= (vMax - vMin) * 0.05;
+    vMax += (vMax - vMin) * 0.05;
+  }
+  // Gridlines
+  ctx.strokeStyle = '#1a2238'; ctx.lineWidth = 1;
+  for (let i = 1; i < 4; i++) {
+    const y = (i / 4) * h;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+  }
+  // Plot
+  function plot(get, color, thickness) {
+    ctx.strokeStyle = color; ctx.lineWidth = thickness; ctx.beginPath();
+    let started = false;
+    for (let k = s.n - 1; k >= 0; k--) {
+      const i = (s.head - 1 - k + RING) % RING;
+      const t = s.t[i];
+      if (t < tMin) continue;
+      const x = ((t - tMin) / WIN_MS) * w;
+      const v = get(i);
+      const y = h - ((v - vMin) / (vMax - vMin)) * h;
+      if (!started) { ctx.moveTo(x, y); started = true; }
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+  if (opts.overlays) {
+    for (const ov of opts.overlays) plot(i => ov.s.v[i], ov.color, ov.w || 1.5);
+  } else {
+    plot(i => s.v[i], opts.color || '#fff', opts.w || 2);
+  }
+  // Y label
+  ctx.fillStyle = '#3d5a96'; ctx.font = '10px system-ui';
+  ctx.fillText(Math.round(vMax), 4, 12);
+  ctx.fillText(Math.round(vMin), 4, h - 4);
+}
+
+function tick() {
+  const now = Date.now();
+  // Per-second receive rate
+  if (now - lastSecAt >= 1000) {
+    elRate.textContent = lastSecRecv + ' Hz';
+    lastSecRecv = 0;
+    lastSecAt = now;
+  }
+  // Last-message age
+  if (lastMsgAt) {
+    elAge.textContent = (now - lastMsgAt) + ' ms';
+    if (now - lastMsgAt > 2000) {
+      document.getElementById('conn').textContent = 'STALE';
+      document.getElementById('conn').className = 'pill dead';
+    }
+  }
+  if (latest) {
+    elGear.textContent = gearLabel(latest.gear);
+    elGear.className = 'gear';
+    if (latest.flags?.rev) elGear.classList.add('rev');
+    else if (latest.sgear && latest.sgear !== 15 && latest.sgear !== latest.gear) elGear.classList.add('shift');
+    elSpeed.textContent = (latest.sp || 0).toFixed(0);
+    const thr = (latest.thr || 0) / 2.55;
+    const brk = (latest.brk || 0) / 2.55;
+    elThrFill.style.height = thr.toFixed(1) + '%';
+    elBrkFill.style.height = brk.toFixed(1) + '%';
+    elThrPct.textContent = thr.toFixed(0) + '%';
+    elBrkPct.textContent = brk.toFixed(0) + '%';
+    elLast.textContent = fmtLap(latest.lastMs);
+    elBest.textContent = fmtLap(latest.bestMs);
+    elLap.textContent  = latest.lap || '—';
+    elPos.textContent  = latest.pos > 0 ? latest.pos : '—';
+    elTFL.textContent = latest.tFL != null ? latest.tFL.toFixed(0) : '—';
+    elTFR.textContent = latest.tFR != null ? latest.tFR.toFixed(0) : '—';
+    elTRL.textContent = latest.tRL != null ? latest.tRL.toFixed(0) : '—';
+    elTRR.textContent = latest.tRR != null ? latest.tRR.toFixed(0) : '—';
+    elTFL.parentElement.style.background = tireColor(latest.tFL);
+    elTFR.parentElement.style.background = tireColor(latest.tFR);
+    elTRL.parentElement.style.background = tireColor(latest.tRL);
+    elTRR.parentElement.style.background = tireColor(latest.tRR);
+    elRpmVal.textContent = Math.round(latest.rpm || 0);
+    // Body alarm on rev limiter
+    document.body.classList.toggle('alarm', !!latest.flags?.rev);
+    // Flags strip
+    elFlags.innerHTML = ['rev','asm','tcs'].map(k => {
+      const on = latest.flags?.[k];
+      return '<span class="' + (on ? 'on' : 'off') + '">' + k.toUpperCase() + '</span>';
+    }).join('');
+  }
+  drawRpmBar();
+  drawTrace(elSpeedTrace, series.speed, { color: '#00d4ff', vMin: 0 });
+  drawTrace(elRpmTrace,   series.rpm,   { color: '#ffeb3b', vMin: 0 });
+  drawTrace(elPedalTrace, series.brake, { vMin: 0, vMax: 100, overlays: [
+    { s: series.throttle, color: '#00e676', w: 1.6 },
+    { s: series.brake,    color: '#ff5252', w: 1.6 },
+  ]});
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body></html>`;
+}
+
 function renderOverviewHtml() {
   const drivers = driverStore.listDrivers();
   const active  = driverStore.getActive();
@@ -1515,6 +1866,7 @@ ${(() => {
 <div class="panel">
   <h2>Pages</h2>
   <ul>
+    <li><a href="/hud60">/hud60</a> — <b style="color:#00e676">60Hz streaming HUD</b> (Server-Sent Events + requestAnimationFrame, full-screen pit-wall view)</li>
     <li><a href="/laps">/laps</a> — every lap from today, sector splits, theoretical best, variation stats</li>
     <li><a href="/track">/track</a> — live SVG track map: PB lap, last lap, current car position, sector markers</li>
     <li><a href="/events">/events</a> — structured event log (session_start, lap_end, pb_set)</li>
@@ -1662,6 +2014,28 @@ ${c ? `
         active: driverStore.getActive(),
       }, null, 2);
       res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(body);
+    } else if (req.url === '/hud60/stream') {
+      // Server-Sent Events: open a long-lived response, register with broker.
+      res.writeHead(200, {
+        'Content-Type':      'text/event-stream',
+        'Cache-Control':     'no-cache, no-store, must-revalidate',
+        'Connection':        'keep-alive',
+        'X-Accel-Buffering': 'no',
+      });
+      res.write('retry: 2000\n\n');
+      sseBroker.subscribe('hud60', res);
+      const hb = setInterval(() => {
+        try { res.write(': heartbeat\n\n'); } catch { clearInterval(hb); }
+      }, 15000);
+      res.on('close', () => clearInterval(hb));
+      return;
+    } else if (req.url === '/hud60') {
+      const body = renderHud60Html();
+      res.writeHead(200, {
+        'Content-Type':  'text/html; charset=utf-8',
+        'Cache-Control': 'no-store',
+      });
       res.end(body);
     } else if (req.url === '/position.json') {
       // High-frequency endpoint used by the live track-page audio coach.

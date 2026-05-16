@@ -22,6 +22,9 @@ const metadata = require('./src/capture/metadata');
 const { LapPredictor } = require('./src/analysis/lap-predictor');
 const { EventLogger }  = require('./src/analysis/event-logger');
 const driverStore      = require('./src/analysis/driver-store');
+const livePublisher    = require('./src/publishers/live-publisher');
+const mqttPublisher    = require('./src/publishers/mqtt-publisher');
+const sseBroker        = require('./src/publishers/sse-broker');
 
 const predictor = new LapPredictor();
 let events = null; // initialized after RECORD_DIR is established
@@ -278,6 +281,46 @@ sock.on('message', (msg) => {
         theoreticalBestMs: prediction.theoreticalBestMs,
       });
     }
+  }
+
+  // Fire-and-forget streaming pushes. Errors are swallowed inside the
+  // publishers so a slow downstream doesn't stall the UDP loop.
+  livePublisher.publishPacket(parsed);
+  mqttPublisher.publishPacket(parsed);
+
+  // 60Hz SSE broadcast for /hud60 — only does work if browsers are subscribed.
+  if (sseBroker.subscriberCount('hud60') > 0) {
+    sseBroker.broadcast('hud60', {
+      t:    Date.now(),
+      sp:   parsed.speedKph,
+      rpm:  parsed.engineRpm,
+      maxRpm: parsed.maxRpmAlert,
+      gear: parsed.currentGear,
+      sgear: parsed.suggestedGear,
+      thr:  parsed.throttle,
+      brk:  parsed.brake,
+      fuel: parsed.fuelLevel,
+      fuelCap: parsed.fuelCapacity,
+      lap:  parsed.lapCount,
+      laps: parsed.lapsInRace,
+      pos:  parsed.racePosition,
+      lastMs: parsed.lastLapTimeMs,
+      bestMs: parsed.bestLapTimeMs,
+      water: parsed.waterTempC,
+      oil:   parsed.oilTempC,
+      oilP:  parsed.oilPressure,
+      boost: parsed.boostBar,
+      tFL: parsed.tireTempC.fl, tFR: parsed.tireTempC.fr,
+      tRL: parsed.tireTempC.rl, tRR: parsed.tireTempC.rr,
+      x: parsed.position.x, y: parsed.position.y, z: parsed.position.z,
+      flags: {
+        rev:  parsed.flags.revLimiterAlert ? 1 : 0,
+        asm:  parsed.flags.asmActive ? 1 : 0,
+        tcs:  parsed.flags.tcsActive ? 1 : 0,
+        race: parsed.flags.inRace ? 1 : 0,
+        paus: parsed.flags.paused ? 1 : 0,
+      },
+    });
   }
 
   // GT7 sends ~60 packets/sec — re-arm heartbeat every 100 packets.

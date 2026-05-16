@@ -13,6 +13,11 @@ not returning to zero).
 
 ## What it does
 
+- **60Hz streaming HUD** at `http://localhost:9477/hud60` — full-screen
+  pit-wall view that updates at the browser's native refresh rate via
+  Server-Sent Events + `requestAnimationFrame`. Bypasses Grafana's 5-second
+  refresh floor entirely. Renders gear / speed / RPM / throttle / brake /
+  lap times / tire temps / 30s streaming traces with zero external deps.
 - **Live HUD** at `http://localhost:9477/` showing speed, gear, RPM, throttle,
   brake, lap deltas, sector splits.
 - **Live track map** with PB lap, last lap, and live car position. Overlay any
@@ -123,6 +128,8 @@ Prometheus + Grafana. Double-click in Explorer or call the underlying
 | URL | What |
 |---|---|
 | `/` | Overview + driver picker + cutoff banner |
+| **`/hud60`** | **60Hz streaming HUD** — full-screen pit-wall view via Server-Sent Events + `requestAnimationFrame` |
+| `/hud60/stream` | Raw SSE channel — JSON event per UDP packet (~60Hz when driving) |
 | `/laps` | Today's laps with sector splits, theoretical best, variation stats |
 | `/micro?n=30&mode=cause` | μ-sector heatmap (n=10/30/60/100, mode=cause/loss) |
 | `/track?n=30&mode=cause` | Live SVG track map with ghost overlay + dark-spot circles |
@@ -153,6 +160,10 @@ gt7-telemetry-analyzer/
 │   │   ├── driver-store.js   # driver profiles
 │   │   ├── cutoff-store.js   # leaderboard cutoff tracker
 │   │   └── event-logger.js   # session_start / lap_end / pb_set event log
+│   ├── publishers/           # outbound streaming
+│   │   ├── sse-broker.js     # Server-Sent Events broadcaster (powers /hud60)
+│   │   ├── live-publisher.js # Grafana Live HTTP push (optional, requires token)
+│   │   └── mqtt-publisher.js # MQTT 3.1.1 publisher (optional, requires MQTT_URL)
 │   └── server/
 │       └── metrics.js        # HTTP server + Prometheus exposition + dashboards
 ├── tools/                    # standalone CLI analyzers
