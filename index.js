@@ -5,11 +5,11 @@
 // decrypts each packet with Salsa20, parses it, prints a live HUD,
 // and records every packet to a JSONL log under ./recordings/.
 //
-//   node index.js --ps5 192.168.1.42    # set your PS5's LAN IP (required)
+//   node index.js --ps5 <YOUR_PS5_IP>    # set your PS5's LAN IP (required)
 //   node index.js --no-record           # disable disk recording
 //   node index.js --quiet               # disable HUD (still records)
 //
-// Or set env var: GT7_PS5_HOST=192.168.1.42 node index.js
+// Or set env var: GT7_PS5_HOST=<YOUR_PS5_IP> node index.js
 
 const dgram = require('node:dgram');
 const fs    = require('node:fs');
@@ -42,7 +42,7 @@ function arg(flag, fallback) {
 
 const PS5_HOST       = arg('--ps5', process.env.GT7_PS5_HOST || '');
 if (!PS5_HOST) {
-  process.stderr.write('error: PS5 host required. Pass --ps5 192.168.1.42 or set GT7_PS5_HOST.\n');
+  process.stderr.write('error: PS5 host required. Pass --ps5 <YOUR_PS5_IP> or set GT7_PS5_HOST.\n');
   process.exit(1);
 }
 const HEARTBEAT_PORT = Number(arg('--hb-port', 33739));

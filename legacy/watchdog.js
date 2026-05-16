@@ -6,7 +6,7 @@
 // so no data from prior runs is overwritten.
 //
 //   node watchdog.js                    # forwards all args to index.js
-//   node watchdog.js --ps5 192.168.1.42
+//   node watchdog.js --ps5 <YOUR_PS5_IP>
 //
 // Stop with Ctrl-C — the watchdog forwards SIGINT to the child, waits for it
 // to flush the recording, then exits cleanly.
