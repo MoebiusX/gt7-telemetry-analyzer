@@ -80,20 +80,30 @@ This is community-known; this codebase implements:
 ### Prerequisites
 
 - **Node.js ≥ 18**
-- **Your PS5's LAN IP** (find it under `Settings → Network → View Connection
-  Status`)
+- **Your PS5's LAN IP address** — required. Find it on the console under
+  `Settings → Network → View Connection Status → IPv4 Address`.
+  Tip: give the PS5 a static lease in your router so the IP never moves.
+  Or, even cleaner, map a friendly hostname (e.g. `ps5.home.local`) to
+  the IP in your `hosts` file or local DNS and pass the hostname instead.
 - (Optional) Prometheus + Grafana for dashboards. Native binaries can live
   under `monitoring/native/` (gitignored — download separately from
   prometheus.io and grafana.com).
 
 ### Run
 
+The `192.168.1.42` below is an example — **replace it with the IP (or
+hostname) of YOUR PS5**, found in the console's Network settings.
+
 ```powershell
-# From the repo root:
-node index.js --ps5 192.168.1.42
+# Pass via flag:
+node index.js --ps5 192.168.1.42      # ← replace with YOUR PS5's IP
 
 # Or via env var:
-$env:GT7_PS5_HOST = "192.168.1.42"; node index.js
+$env:GT7_PS5_HOST = "192.168.1.42"    # ← same
+node index.js
+
+# Or with a friendly hostname (if you've mapped it in hosts/DNS):
+node index.js --ps5 ps5.home.local
 ```
 
 Open `http://localhost:9477/` to see the overview, then `/track`, `/laps`,
