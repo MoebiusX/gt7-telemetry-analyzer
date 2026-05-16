@@ -162,13 +162,40 @@ function todayLocal() {
   return `${y}-${m}-${day}`;
 }
 
+let recordingSuspended = false;
+let recordingErrors    = 0;
+let recordingLastErrAt = 0;
+
+function attachRecordingErrorHandler(stream, srcPath) {
+  // Without this, a write error (ENOSPC, EIO, etc.) emits 'error' on the stream
+  // and Node treats it as fatal — taking the whole exporter down. We catch it,
+  // suspend recording, and keep the UDP + metrics + SSE paths alive so the
+  // dashboards stay usable while the user frees space.
+  stream.on('error', (err) => {
+    recordingErrors++;
+    recordingLastErrAt = Date.now();
+    if (!recordingSuspended) {
+      recordingSuspended = true;
+      process.stderr.write(`\n[rec] WRITE ERROR (${err.code || err.message}) on ${srcPath} — suspending recording. Exporter will keep running for live HUD; restart after freeing disk space.\n`);
+    }
+    try { stream.destroy(); } catch {}
+  });
+}
+
 function openRecording() {
   if (!RECORD) return;
-  fs.mkdirSync(RECORD_DIR, { recursive: true });
-  recordPath = path.join(RECORD_DIR, `gt7-${todayLocal()}.jsonl`);
-  recordStream = fs.createWriteStream(recordPath, { flags: 'a' });
-  process.stdout.write(`[rec] writing to ${recordPath}\n`);
-  scheduleRotation();
+  try {
+    fs.mkdirSync(RECORD_DIR, { recursive: true });
+    recordPath = path.join(RECORD_DIR, `gt7-${todayLocal()}.jsonl`);
+    recordStream = fs.createWriteStream(recordPath, { flags: 'a' });
+    attachRecordingErrorHandler(recordStream, recordPath);
+    recordingSuspended = false;
+    process.stdout.write(`[rec] writing to ${recordPath}\n`);
+    scheduleRotation();
+  } catch (e) {
+    recordingSuspended = true;
+    process.stderr.write(`[rec] could not open recording: ${e.message}. Live HUD will run; recording disabled.\n`);
+  }
 }
 
 function scheduleRotation() {
@@ -182,6 +209,8 @@ function rotateRecording() {
   const oldStream = recordStream;
   recordPath = path.join(RECORD_DIR, `gt7-${todayLocal()}.jsonl`);
   recordStream = fs.createWriteStream(recordPath, { flags: 'a' });
+  attachRecordingErrorHandler(recordStream, recordPath);
+  recordingSuspended = false;
   process.stdout.write(`[rec] rotated -> ${recordPath}\n`);
   if (oldStream) oldStream.end(() => process.stdout.write(`[rec] closed ${oldPath}\n`));
   resetSessionMeta();
@@ -191,7 +220,7 @@ function rotateRecording() {
 let lastWrittenCfgV = -1;
 
 function recordPacket(parsed) {
-  if (!recordStream) return;
+  if (!recordStream || recordingSuspended) return;
   const cfg = config.get();
   // Refresh active-driver every ~5s in case the user switched via the UI.
   if (Date.now() - (recordPacket.lastDriverCheckAt || 0) > 5000) {

@@ -109,7 +109,7 @@ $env:GT7_PS5_HOST = "<YOUR_PS5_IP>"
 node index.js
 
 # Or with a friendly hostname (if you've mapped it in hosts/DNS):
-node index.js --ps5 ps5.home.local
+node index.js --ps5 ps5.home.internal
 ```
 
 Open `http://localhost:9477/` to see the overview, then `/track`, `/laps`,
